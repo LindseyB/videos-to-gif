@@ -5,6 +5,13 @@ from PIL import Image, ImageFont, ImageDraw
 from slugify import slugify
 
 directory = "screenshots"
+font = ImageFont.truetype("fonts/DejaVuSansCondensed-BoldOblique.ttf", 16)
+
+def striptags(data):
+  # I'm a bad person, don't ever do this.
+  # Only okay, because of how basic the tags are.
+  p = re.compile(r'<.*?>')
+  return p.sub('', data)
 
 def drawText(draw, x, y, text, font):
   # black outline
@@ -20,11 +27,12 @@ def makeGif(video, start, end, string, output):
   if not os.path.exists(directory):
     os.makedirs(directory)
 
+  text = striptags(string).split("\n")
+
   subprocess.call(['ffmpeg', '-i', video, '-ss', start, '-to', end, os.path.join(directory, 'image-%05d.png')])
 
   file_names = sorted((fn for fn in os.listdir(directory)))
   images = []
-  font = ImageFont.truetype("fonts/DejaVuSansCondensed-BoldOblique.ttf", args.fontsize)
 
   for f in file_names:
     image = Image.open(os.path.join(directory,f))
@@ -36,10 +44,24 @@ def makeGif(video, start, end, string, output):
     except NameError:
       image_size = image.size
 
-    text_size = font.getsize(args.text)
-    x = (image_size[0]/2) - (text_size[0]/2)
-    y = image_size[1] - text_size[1] - args.padding
-    drawText(draw, x, y, args.text, font)
+    # multiple lines in text
+    if len(text) == 2:
+      # at most 2?
+      text_size = font.getsize(text[0])
+      x = (image_size[0]/2) - (text_size[0]/2)
+      y = image_size[1] - (2*text_size[1]) - 5 # padding
+      drawText(draw, x, y, text[0], font)
+
+      text_size = font.getsize(text[1])
+      x = (image_size[0]/2) - (text_size[0]/2)
+      y += text_size[1]
+      drawText(draw, x, y, text[1], font)
+    else:
+      text_size = font.getsize(text[0])
+      x = (image_size[0]/2) - (text_size[0]/2)
+      y = image_size[1] - text_size[1] - 5 # padding
+      drawText(draw, x, y, text[0], font)
+
     image.save(os.path.join(directory,f))
 
   subprocess.call(['convert', '-loop', '0', os.path.join(directory, '*.png'), output])
