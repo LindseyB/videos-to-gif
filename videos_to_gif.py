@@ -65,6 +65,7 @@ def makeGif(video, start, end, string, output):
     image.save(os.path.join(directory,f))
 
   subprocess.call(['convert', '-loop', '0', os.path.join(directory, '*.png'), output])
+  shutil.rmtree(directory)
 
 def main():
   stream = file('files.yml', 'r')
