@@ -69,6 +69,7 @@ def makeGif(video, start, end, string, output):
 def main():
   stream = file('files.yml', 'r')
   data = yaml.load(stream)
+  out_path = data["out_path"]
 
   for file_data in data["files"]:
     video_file_path = file_data["video"]
@@ -81,7 +82,7 @@ def main():
     for sub in subs:
       start = str(sub.start)
       end = str(sub.end - sub.start)
-      makeGif(video_file_path, start, end, sub.text, slugify(sub.text) + ".gif")
+      makeGif(video_file_path, start, end, sub.text, os.path.join(outpath, slugify(sub.text) + ".gif")
 
   shutil.rmtree(directory)
 
