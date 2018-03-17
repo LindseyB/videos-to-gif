@@ -29,7 +29,7 @@ def makeGif(video, start, end, string, output):
 
   text = striptags(string).split("\n")
 
-  subprocess.call(['avconv', '-i', video, '-vf', 'scale=w=400:h=-1', '-r', '30', '-ss', start, '-t', end, os.path.join(directory, 'image-%05d.png')])
+  subprocess.call(['avconv', '-i', video, '-vf', 'scale=w=400:h=-1', '-r', '15', '-ss', start, '-t', end, os.path.join(directory, 'image-%05d.png')])
 
   file_names = sorted((fn for fn in os.listdir(directory)))
   images = []
@@ -70,12 +70,18 @@ def makeGif(video, start, end, string, output):
 def main():
   stream = file('files.yml', 'r')
   data = yaml.load(stream)
-  outpath = data["outpath"]
+  
+  if "outpath" in data:
+    outpath = data["outpath"]
+  else:
+    outpath = ""
 
   for file_data in data["files"]:
     video_file_path = file_data["video"]
     sub_file_path = file_data["subs"]
-    sub_encoding = file_data["encoding"]
+
+    if "encoding" in file_data:
+      sub_encoding = file_data["encoding"]
 
     subs = pysrt.open(sub_file_path, encoding=sub_encoding)
 
@@ -84,8 +90,7 @@ def main():
       start = str(sub.start)
       end = str(sub.end - sub.start)
       makeGif(video_file_path, start, end, sub.text, os.path.join(outpath, slugify(sub.text) + ".gif"))
-
-  shutil.rmtree(directory)
+      break
 
 if __name__ == '__main__':
   main()

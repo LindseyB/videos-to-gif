@@ -5,5 +5,4 @@ files:
     encoding: latin1
   - video: /path/to/video.avi
     subs: /path/to/subs.srt
-    encoding: the-encoding-of-the-srt
-outpath: /where/you/want/the/files
+outpath: /where/you/want/the/files (optional)
