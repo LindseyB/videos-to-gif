@@ -29,7 +29,7 @@ def makeGif(video, start, end, string, output):
 
   text = striptags(string).split("\n")
 
-  subprocess.call(['avconv', '-i', video, '-vf', 'scale=w=400:h=-1', '-ss', start, '-t', end, os.path.join(directory, 'image-%05d.png')])
+  subprocess.call(['avconv', '-i', video, '-vf', 'scale=w=400:h=-1', '-r', '30', '-ss', start, '-t', end, os.path.join(directory, 'image-%05d.png')])
 
   file_names = sorted((fn for fn in os.listdir(directory)))
   images = []
