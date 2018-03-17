@@ -90,7 +90,6 @@ def main():
       start = str(sub.start)
       end = str(sub.end - sub.start)
       makeGif(video_file_path, start, end, sub.text, os.path.join(outpath, slugify(sub.text) + ".gif"))
-      break
 
 if __name__ == '__main__':
   main()
