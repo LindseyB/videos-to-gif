@@ -1,0 +1,9 @@
+files:
+  - 
+    video: /path/to/video.mp4
+    subs: /path/to/subs.srt
+    encoding: latin1
+  - video: /path/to/video.avi
+    subs: /path/to/subs.srt
+    encoding: the-encoding-of-the-srt
+outpath: /where/you/want/the/files
