@@ -69,7 +69,7 @@ def makeGif(video, start, end, string, output):
 def main():
   stream = file('files.yml', 'r')
   data = yaml.load(stream)
-  outpath = data["out_path"]
+  outpath = data["outpath"]
 
   for file_data in data["files"]:
     video_file_path = file_data["video"]
