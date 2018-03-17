@@ -82,7 +82,7 @@ def main():
     for sub in subs:
       start = str(sub.start)
       end = str(sub.end - sub.start)
-      makeGif(video_file_path, start, end, sub.text, os.path.join(outpath, slugify(sub.text) + ".gif")
+      makeGif(video_file_path, start, end, sub.text, os.path.join(outpath, slugify(sub.text) + ".gif"))
 
   shutil.rmtree(directory)
 
