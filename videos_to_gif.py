@@ -82,6 +82,8 @@ def main():
 
     if "encoding" in file_data:
       sub_encoding = file_data["encoding"]
+    else:
+      sub_encoding = "utf-8"
 
     subs = pysrt.open(sub_file_path, encoding=sub_encoding)
 
@@ -89,7 +91,14 @@ def main():
     for sub in subs:
       start = str(sub.start)
       end = str(sub.end - sub.start)
-      makeGif(video_file_path, start, end, sub.text, os.path.join(outpath, slugify(sub.text) + ".gif"))
+
+      gif_filename = os.path.join(outpath, slugify(sub.text) + ".gif")
+      
+      if os.path.isfile(gif_filename):
+        next
+      else:
+        print "generating " + gif_filename + "..."
+        makeGif(video_file_path, start, end, sub.text, gif_filename)
 
 if __name__ == '__main__':
   main()
