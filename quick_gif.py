@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
-import sys, os, argparse, subprocess, shutil, yaml, pysrt
+import sys, os, re, subprocess, shutil, yaml, pysrt
 from PIL import Image, ImageFont, ImageDraw
 from slugify import slugify
 
 directory = "screenshots"
-font = ImageFont.truetype("fonts/DejaVuSansCondensed-BoldOblique.ttf", 16)
+font = ImageFont.truetype("font/DejaVuSansCondensed-BoldOblique.ttf", 14)
 
 def striptags(data):
   # I'm a bad person, don't ever do this.
@@ -29,7 +29,7 @@ def makeGif(video, start, end, string, output):
 
   text = striptags(string).split("\n")
 
-  subprocess.call(['ffmpeg', '-i', video, '-ss', start, '-to', end, os.path.join(directory, 'image-%05d.png')])
+  subprocess.call(['avconv', '-i', video, '-vf', 'scale=w=400:h=-1', '-ss', start, '-t', end, os.path.join(directory, 'image-%05d.png')])
 
   file_names = sorted((fn for fn in os.listdir(directory)))
   images = []
@@ -70,17 +70,18 @@ def main():
   stream = file('files.yml', 'r')
   data = yaml.load(stream)
 
-  for file in data["files"]:
-    video_file_path = file["video"]
-    sub_file_path = file["subs"]
+  for file_data in data["files"]:
+    video_file_path = file_data["video"]
+    sub_file_path = file_data["subs"]
+    sub_encoding = file_data["encoding"]
 
-    subs = pysrt.open(sub_file_path)
+    subs = pysrt.open(sub_file_path, encoding=sub_encoding)
 
     # generate a gif for every line of dialogue
     for sub in subs:
-      start = sub.start
-      end = sub.end - sub.start
-      makeGif(video_file_path, start, end, sub.text, slugify(sub.text))
+      start = str(sub.start)
+      end = str(sub.end - sub.start)
+      makeGif(video_file_path, start, end, sub.text, slugify(sub.text) + ".gif")
 
   shutil.rmtree(directory)
 
