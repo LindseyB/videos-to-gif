@@ -67,7 +67,7 @@ def makeGif(video, start, end, string, output):
   subprocess.call(['convert', '-loop', '0', os.path.join(directory, '*.png'), output])
   shutil.rmtree(directory)
 
-def main():
+def generateAllGifs():
   stream = file('files.yml', 'r')
   data = yaml.load(stream)
   
@@ -102,4 +102,4 @@ def main():
         makeGif(video_file_path, start, end, sub.text, gif_filename)
 
 if __name__ == '__main__':
-  main()
+  generateAllGifs()
