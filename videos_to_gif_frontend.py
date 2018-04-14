@@ -16,6 +16,7 @@ def generateGifs():
         to_generate_list = []
         for index, item in enumerate(sub_list):
             if (item.get() != 0):
+                item.set(0) # uncheck after it's been processed
                 to_generate_list.append(index)
     else:
         return
