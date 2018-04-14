@@ -2,7 +2,7 @@ import Tkinter as tk
 import ttk as ttk
 import tkFileDialog, pysrt, os
 from slugify import slugify
-from videos_to_gif import makeGif
+from videos_to_gif import makeGif, striptags
 
 def onFrameConfigure(canvas):
     canvas.configure(scrollregion=canvas.bbox("all"))
@@ -16,7 +16,6 @@ def generateGifs():
         to_generate_list = []
         for index, item in enumerate(sub_list):
             if (item.get() != 0):
-                print subs[index].text
                 to_generate_list.append(index)
     else:
         return
@@ -40,6 +39,8 @@ def generateGifs():
         popup.update()
         progress += progress_step
         progress_var.set(progress)
+
+    popup.destroy()
 
 subs = None
 video_path = None
@@ -78,7 +79,7 @@ canvas.bind_all("<MouseWheel>", onMousewheel)
 
 for sub in subs:
     sub_list.append(tk.IntVar())
-    check = tk.Checkbutton(frame, text=sub.text, variable=sub_list[index])
+    check = tk.Checkbutton(frame, text=striptags(sub.text), variable=sub_list[index])
     check.grid(row=index, sticky=tk.W)
     index+=1
 

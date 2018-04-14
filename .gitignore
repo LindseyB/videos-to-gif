@@ -1,2 +1,4 @@
 files.yml
+*.gif
+*.pyc
 screenshots
