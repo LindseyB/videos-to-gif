@@ -37,7 +37,7 @@ def makeGif(video, starts, ends, strings, output):
     end = ends[index]
     text = striptags(string).split("\n")
 
-    subprocess.call(['C:\\Users\\hazar\\Downloads\\libav-11.3-win64\\win64\\usr\\bin\\avconv', '-i', video, '-vf', 'scale=w=400:h=-1', '-r', '15', '-ss', start, '-t', end, os.path.join(directory, 'image-%05d.png')])
+    subprocess.call(['avconv', '-i', video, '-vf', 'scale=w=400:h=-1', '-r', '15', '-ss', start, '-t', end, os.path.join(directory, 'image-%05d.png')])
 
     file_names = sorted((fn for fn in os.listdir(directory)))
     images = []
@@ -72,10 +72,10 @@ def makeGif(video, starts, ends, strings, output):
 
       image.save(os.path.join(directory,f))
 
-    subprocess.call(["C:\\Program Files\\ImageMagick-7.0.7-Q16\\convert.exe", '-loop', '0', os.path.join(directory, '*.png'), os.path.join(gif_dir, "temp"+str(index)+".gif")])
+    subprocess.call(["convert", '-loop', '0', os.path.join(directory, '*.png'), os.path.join(gif_dir, "temp"+str(index)+".gif")])
     shutil.rmtree(directory)
   
-  subprocess.call(["C:\\Program Files\\ImageMagick-7.0.7-Q16\\convert.exe", '-loop', '0', os.path.join(gif_dir, '*.gif'), output])
+  subprocess.call(["convert", '-loop', '0', os.path.join(gif_dir, '*.gif'), output])
   shutil.rmtree(gif_dir)
   
 
