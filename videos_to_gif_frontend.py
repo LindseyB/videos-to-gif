@@ -32,11 +32,32 @@ def generateGifs():
     progress_step = float(100.0/len(to_generate_list))
 
     for index in to_generate_list:
+        texts = []
+        starts = []
+        ends = []
+        filename = ""
+
         sub = subs[index]
-        start = str(sub.start).replace(',', '.')
-        end = str(sub.end - sub.start).replace(',', '.')
-        gif_filename = os.path.join(slugify(sub.text) + ".gif")
-        makeGif(video_path, start, end, sub.text, gif_filename)
+        starts.append(str(sub.start).replace(',', '.'))
+        ends.append(str(sub.end - sub.start).replace(',', '.'))
+        texts.append(sub.text)
+        filename = slugify(sub.text)
+
+        append_offset = index
+        while True:
+            if (merge_list[append_offset].get() != 0):
+                sub = subs[append_offset+1]
+                starts.append(str(sub.start).replace(',', '.'))
+                ends.append(str(sub.end - sub.start).replace(',', '.'))
+                texts.append(sub.text)
+                filename = filename + "-" + slugify(sub.text)
+                append_offset += 1
+            else:
+                break
+
+        gif_filename = os.path.join(filename + ".gif")
+        makeGif(video_path, starts, ends, texts, gif_filename)
+
         popup.update()
         progress += progress_step
         progress_var.set(progress)
@@ -45,6 +66,7 @@ def generateGifs():
 
 subs = None
 video_path = None
+subtitle_path = None
 root = tk.Tk()
 root.title("Videos to Gif Frontend")
 
@@ -60,10 +82,15 @@ if video_path:
     w = tk.Label(root, text="Possible gifs for: " + video_path)
     w.pack()
 
+if subtitle_path:
+    w = tk.Label(root, text="Subs for: " + subtitle_path)
+    w.pack()
+
 b = tk.Button(root, text="Generate GIFs for Selected Quotes", command=generateGifs, bg="white")
 b.pack()
 
 sub_list = []
+merge_list = []
 index = 0
 
 canvas = tk.Canvas(root, borderwidth=0)
@@ -80,8 +107,11 @@ canvas.bind_all("<MouseWheel>", onMousewheel)
 
 for sub in subs:
     sub_list.append(tk.IntVar())
+    merge_list.append(tk.IntVar())
     check = tk.Checkbutton(frame, text=striptags(sub.text), variable=sub_list[index])
     check.grid(row=index, sticky=tk.W)
+    merge_check = tk.Checkbutton(frame, variable=merge_list[index])
+    merge_check.grid(row=index, sticky=tk.E)
     index+=1
 
 root.mainloop()

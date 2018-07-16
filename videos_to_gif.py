@@ -5,6 +5,7 @@ from PIL import Image, ImageFont, ImageDraw
 from slugify import slugify
 
 directory = "screenshots"
+gif_dir = "gifs"
 font = ImageFont.truetype("font/DejaVuSansCondensed-BoldOblique.ttf", 14)
 
 def striptags(data):
@@ -23,49 +24,60 @@ def drawText(draw, x, y, text, font):
   # white text
   draw.text((x, y),text,(255,255,255),font=font)
 
-def makeGif(video, start, end, string, output):
-  if not os.path.exists(directory):
-    os.makedirs(directory)
+def makeGif(video, starts, ends, strings, output):
+  if not os.path.exists(gif_dir):
+    os.makedirs(gif_dir)
 
-  text = striptags(string).split("\n")
+  for index in range(0, len(starts)):
+    if not os.path.exists(directory):
+      os.makedirs(directory)
 
-  subprocess.call(['C:\\Users\\hazar\\Downloads\\libav-11.3-win64\\win64\\usr\\bin\\avconv', '-i', video, '-vf', 'scale=w=400:h=-1', '-r', '15', '-ss', start, '-t', end, os.path.join(directory, 'image-%05d.png')])
+    string = strings[index]
+    start = starts[index]
+    end = ends[index]
+    text = striptags(string).split("\n")
 
-  file_names = sorted((fn for fn in os.listdir(directory)))
-  images = []
+    subprocess.call(['C:\\Users\\hazar\\Downloads\\libav-11.3-win64\\win64\\usr\\bin\\avconv', '-i', video, '-vf', 'scale=w=400:h=-1', '-r', '15', '-ss', start, '-t', end, os.path.join(directory, 'image-%05d.png')])
 
-  for f in file_names:
-    image = Image.open(os.path.join(directory,f))
-    draw = ImageDraw.Draw(image)
+    file_names = sorted((fn for fn in os.listdir(directory)))
+    images = []
 
-    # reddit tells me this patten sucks, but I like it
-    try:
-      image_size
-    except NameError:
-      image_size = image.size
+    for f in file_names:
+      image = Image.open(os.path.join(directory,f))
+      draw = ImageDraw.Draw(image)
 
-    # multiple lines in text
-    if len(text) == 2:
-      # at most 2?
-      text_size = font.getsize(text[0])
-      x = (image_size[0]/2) - (text_size[0]/2)
-      y = image_size[1] - (2*text_size[1]) - 5 # padding
-      drawText(draw, x, y, text[0], font)
+      # reddit tells me this patten sucks, but I like it
+      try:
+        image_size
+      except NameError:
+        image_size = image.size
 
-      text_size = font.getsize(text[1])
-      x = (image_size[0]/2) - (text_size[0]/2)
-      y += text_size[1]
-      drawText(draw, x, y, text[1], font)
-    else:
-      text_size = font.getsize(text[0])
-      x = (image_size[0]/2) - (text_size[0]/2)
-      y = image_size[1] - text_size[1] - 5 # padding
-      drawText(draw, x, y, text[0], font)
+      # multiple lines in text
+      if len(text) == 2:
+        # at most 2?
+        text_size = font.getsize(text[0])
+        x = (image_size[0]/2) - (text_size[0]/2)
+        y = image_size[1] - (2*text_size[1]) - 5 # padding
+        drawText(draw, x, y, text[0], font)
 
-    image.save(os.path.join(directory,f))
+        text_size = font.getsize(text[1])
+        x = (image_size[0]/2) - (text_size[0]/2)
+        y += text_size[1]
+        drawText(draw, x, y, text[1], font)
+      else:
+        text_size = font.getsize(text[0])
+        x = (image_size[0]/2) - (text_size[0]/2)
+        y = image_size[1] - text_size[1] - 5 # padding
+        drawText(draw, x, y, text[0], font)
 
-  subprocess.call(["C:\\Program Files\\ImageMagick-7.0.7-Q16\\convert.exe", '-loop', '0', os.path.join(directory, '*.png'), output])
-  shutil.rmtree(directory)
+      image.save(os.path.join(directory,f))
+
+    subprocess.call(["C:\\Program Files\\ImageMagick-7.0.7-Q16\\convert.exe", '-loop', '0', os.path.join(directory, '*.png'), os.path.join(gif_dir, "temp"+str(index)+".gif")])
+    shutil.rmtree(directory)
+  
+  subprocess.call(["C:\\Program Files\\ImageMagick-7.0.7-Q16\\convert.exe", '-loop', '0', os.path.join(gif_dir, '*.gif'), output])
+  shutil.rmtree(gif_dir)
+  
 
 def generateAllGifs():
   stream = file('files.yml', 'r')
