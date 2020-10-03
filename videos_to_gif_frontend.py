@@ -11,6 +11,10 @@ def onMousewheel(event):
     # lol doesn't work on linux
     canvas.yview_scroll(-1*(event.delta/120), "units")
 
+def selectAll():
+    for button in sub_buttons:
+        button.select()
+
 def generateGifs():
     if video_path and subs:
         to_generate_list = []
@@ -89,8 +93,12 @@ if subtitle_path:
 b = tk.Button(root, text="Generate GIFs for Selected Quotes", command=generateGifs, bg="white")
 b.pack()
 
+b_all = tk.Button(root, text="Select All", command=selectAll, bg="white")
+b_all.pack()
+
 sub_list = []
 merge_list = []
+sub_buttons = []
 index = 0
 
 canvas = tk.Canvas(root, borderwidth=0)
@@ -109,6 +117,7 @@ for sub in subs:
     sub_list.append(tk.IntVar())
     merge_list.append(tk.IntVar())
     check = tk.Checkbutton(frame, text=striptags(sub.text), variable=sub_list[index])
+    sub_buttons.append(check)
     check.grid(row=index, sticky=tk.W)
     merge_check = tk.Checkbutton(frame, variable=merge_list[index])
     merge_check.grid(row=index, sticky=tk.E)
