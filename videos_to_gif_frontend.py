@@ -1,8 +1,15 @@
+# coding: utf-8
+
 import Tkinter as tk
 import ttk as ttk
 import tkFileDialog, pysrt, os
+import unicodecsv as csv
 from slugify import slugify
 from videos_to_gif import makeGif, striptags
+from unidecode import unidecode
+
+# TODO: right now we're magically toggling this
+generate_csv = True
 
 def onFrameConfigure(canvas):
     canvas.configure(scrollregion=canvas.bbox("all"))
@@ -35,6 +42,13 @@ def generateGifs():
 
     progress_step = float(100.0/len(to_generate_list))
 
+    if generate_csv: 
+        csvfile = open('names.csv', 'w')
+        fieldnames = ['index', 'filename', 'dialog']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+    i = 0
     for index in to_generate_list:
         texts = []
         starts = []
@@ -45,7 +59,7 @@ def generateGifs():
         starts.append(str(sub.start).replace(',', '.'))
         ends.append(str(sub.end - sub.start).replace(',', '.'))
         texts.append(sub.text)
-        filename = slugify(sub.text)
+        filename = format(i, '05') + '-' + slugify(unidecode(sub.text))
 
         append_offset = index
         while True:
@@ -54,19 +68,33 @@ def generateGifs():
                 starts.append(str(sub.start).replace(',', '.'))
                 ends.append(str(sub.end - sub.start).replace(',', '.'))
                 texts.append(sub.text)
-                filename = filename + "-" + slugify(sub.text)
+                filename = filename + "-" + slugify(unidecode(sub.text))
                 append_offset += 1
             else:
                 break
 
         gif_filename = os.path.join(filename + ".gif")
-        makeGif(video_path, starts, ends, texts, gif_filename)
+        
+        if not os.path.exists(gif_filename):
+            try:
+                makeGif(video_path, starts, ends, texts, gif_filename)
+            except UnicodeEncodeError:
+                texts = map(lambda t: unidecode(t), texts)
+                makeGif(video_path, starts, ends, texts, gif_filename)
+
+        if generate_csv:
+            writer.writerow({'index': i, 'filename': gif_filename, 'dialog': sub.text})
 
         popup.update()
         progress += progress_step
         progress_var.set(progress)
+        i+=1
 
     popup.destroy()
+
+    if generate_csv:
+        csvfile.close()
+
 
 subs = None
 video_path = None
