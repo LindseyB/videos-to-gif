@@ -1,4 +1,4 @@
 pysrt==1.1.2
-Pillow==10.0.1
+Pillow==10.1.0
 unicode_slugify==0.1.5
 PyYAML==6.0.1
